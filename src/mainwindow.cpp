@@ -10,6 +10,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    memset(class_pool, 0, sizeof(uint8_t)*CLASS_CAPACITY);
+
     QWidget * centerWidget = new QWidget(this);
 
     this->setCentralWidget(centerWidget);
@@ -68,15 +70,29 @@ int MainWindow::load_pcd_file(string path, pc_1d_t *pc)
         }
         else if(1 == read_stage) // Read data
         {
-            if(3 > words.size())
+            if(4 > words.size())
             {
                 continue;
             }
             if(i<pc->n)
             {
-                *((float*)(pc->data+i*pc->size + pc->pos_x)) = stof(words[1]);
-                *((float*)(pc->data+i*pc->size + pc->pos_y)) = stof(words[2]);
-                *((float*)(pc->data+i*pc->size + pc->pos_z)) = stof(words[3]);
+                *((float*)(pc->data+i*pc->size + pc->pos_x)) = stof(words[0]);
+                *((float*)(pc->data+i*pc->size + pc->pos_y)) = stof(words[1]);
+                *((float*)(pc->data+i*pc->size + pc->pos_z)) = stof(words[2]);
+
+                float x = stof(words[0]);
+                float y = stof(words[1]);
+                float z = stof(words[2]);
+
+                int id = stoi(words[3]);
+                if(CLASS_CAPACITY-1 < id)
+                {
+                    PRINT_ERROR("points id:%d not must < %d", id, CLASS_CAPACITY);
+                    return 1;
+                }
+
+                pc_datas[i]<<QVector3D(x, y, z);
+
             }
             else
             {
@@ -85,8 +101,19 @@ int MainWindow::load_pcd_file(string path, pc_1d_t *pc)
             }
 
         }
-
     }
+
+    for(int i=0; i<CLASS_CAPACITY; i++)
+    {
+        if(pc_datas[i].size() >0 )
+        {
+            pc_sets[i].dataProxy()->addItems(pc_datas[i]);
+            pc_sets[i].setItemSize(0.05);
+        }
+        this->scatter->addSeries(&(pc_sets[i]));
+    }
+
+
     return 0;
 }
 

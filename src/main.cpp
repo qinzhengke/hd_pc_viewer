@@ -6,6 +6,6 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
     MainWindow mw;
     mw.show();
-    mw.loadPCDFile("test.pcd");
+    mw.loadPCDFile("../data/test.pcd");
     return a.exec();
 }

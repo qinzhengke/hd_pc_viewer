@@ -10,6 +10,8 @@
 using namespace std;
 using namespace QtDataVisualization;
 
+#define CLASS_CAPACITY 32
+
 typedef struct
 {
     uint8_t *data;
@@ -32,6 +34,12 @@ public:
     int loadPCDFile(QString path);
 
     int load_pcd_file(string path, pc_1d_t *pc);
+
+    QScatter3DSeries pc_sets[CLASS_CAPACITY];
+    QScatterDataArray pc_datas[CLASS_CAPACITY];
+
+    // Max number of points set 32
+    uint8_t class_pool[CLASS_CAPACITY];
 
 private:
     Q3DScatter *scatter;
